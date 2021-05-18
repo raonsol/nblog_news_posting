@@ -1,8 +1,17 @@
-﻿var TEMPLATE_TARGET = "C:/Users/MGEN/Desktop/LYJ/11. Blog/Template/";
-var TEMPLATE_NAME = "01_3DMET.ai"
-var TEMPLATE_DEST = "C:/Users/MGEN/Desktop/LYJ/11. Blog/Output/";
-var NEWSPAPER_NAME ="한국경제";
-var HEADLINE_CONTENT = "만도, VR로 라이다센서 고도화";
+﻿// options: IPF, MGEN
+var TEMPLATE_TYPE = "IPF";
+
+// IPF: 1=특허, 2=상표디자인, 3=저작권, 4=IP분쟁소송, 5=Startup Info.
+//MGEN: 1=BLOCKCHAIN, 2=SMART FACTORY, 3=3DMET
+var TEMPLATE_NAME=1;
+
+var NEWSPAPER_NAME ="연합뉴스";
+var HEADLINE_CONTENT = "SNS 활용 마케팅 서비스 특허출원 급증…5년간 연평균 28%↑";
+
+var DEST_MGEN="C:/Users/MGEN/Desktop/LYJ/11. Blog/Output/";
+var DEST_IPF="C:/Users/MGEN/Desktop/LYJ/00. IPF/Output/";
+var TARGET_MGEN="C:/Users/MGEN/Desktop/LYJ/11. Blog/Template/";
+var TARGET_IPF="C:/Users/MGEN/Desktop/LYJ/00. IPF/new/";
 
 //return date as yy-mm-dd format
 Date.prototype.yymmdd=function(){
@@ -12,10 +21,14 @@ Date.prototype.yymmdd=function(){
     return yy+"-"+(mm[1]?mm:'0'+mm[0])+"-"+(dd[1]?dd:'0'+dd[0]);
 }
 
-var doc = getTargetFile(TEMPLATE_TARGET+TEMPLATE_NAME);
-var output_path = getOutputPath(TEMPLATE_DEST);
-var output_name = getOutputName();
-var output_file = new File(output_path+output_name+".png");
+var tempTarget=getTarget(TEMPLATE_TYPE, TEMPLATE_NAME);
+var doc = getTargetFile(tempTarget);
+
+var tempDest=getDest(TEMPLATE_TYPE);
+var outPath = getDatePath(tempDest);
+var outName = getOutputName();
+var outFile = new File(outPath+outName+".png");
+
 var content={};
 content.newspaper=NEWSPAPER_NAME;
 content.headline=HEADLINE_CONTENT;
@@ -25,7 +38,6 @@ if(doc) createImage(content);
 
 function createImage(content){
     //select item in layer
-    
     var layer_content=doc.layers.getByName('Content');
     var item_newspaper = layer_content.pageItems.getByName('newspaper');
     var item_date=layer_content.pageItems.getByName('date');
@@ -43,8 +55,68 @@ function createImage(content){
     var activeAB = doc.artboards[doc.artboards.getActiveArtboardIndex()];
     
     //export
-    doc.imageCapture (output_file, activeAB.artboardRect, opt);
-    alert("File exported to" + output_file.toString());
+    doc.imageCapture (outFile, activeAB.artboardRect, opt);
+    alert("File exported to" + outFile.toString());
+}
+
+function getTarget(type, content){
+    var targetPath;
+    var targetName;
+    if(type=="IPF"){
+        targetPath=TARGET_IPF;
+        switch(content){
+            case 1:
+            targetName="01_특허";
+            break;
+            case 2:
+            targetName="02_상표디자인";
+            break;
+            case 3:
+            targetName="03_저작권";
+            break;
+            case 4:
+            targetName="04_IP분쟁소송";
+            break;
+            case 5:
+            targetName="05_Startup information";
+            break;
+            default:
+            alert("Content type mismatch");
+            return null;
+            }
+        return targetPath+targetName+".ai/";
+        }
+    else if(type=="MGEN"){
+        targetPath=TARGET_MGEN;
+        switch(content){
+            case 1:
+            targetName="01_BLOCKCHAIN";
+            break;
+            case 2:
+            targetName="02_SMART_FACTORY";
+            break;
+            case 3:
+            targetName="03_3DMET";
+            break;
+            default:
+            alert("Content type mismatch");
+            return null;
+            }
+        return targetPath+targetName+".ai/";
+        }
+    else{
+        alert ("Blog Type mismatch");
+        return null;
+    }
+}
+
+function getDest(type){
+    if(type=="IPF") return DEST_IPF;
+    else if(type=="MGEN") return DEST_MGEN;
+    else{
+        alert ("Type mismatch");
+        return null;
+    }
 }
 
 function setOption(ppi, transparency, matte){
@@ -70,7 +142,7 @@ function getTargetFile(target_path){
      }
 }
 
-function getOutputPath(outpath){
+function getDatePath(outpath){
     var date=new Date();
     var year=date.getFullYear().toString();
     var month=(date.getMonth()+1).toString();
