@@ -18,15 +18,15 @@ import json
 #############################################################################################
 # Type entry:
 # [MGEN] for mgen blog, [IPF] for IPFrontiers blog
-TYPE='IPF'
+TYPE='MGEN'
 # Category entry for MGEN:
 # blockchain, smart_factory, 3dmet
 # Category entry for IPF:
 # patent=특허, design=상표디자인, copyright=저작권, ipsuit=IP분쟁소송, startup=Startup Info.
-CATEGORY="design"
+CATEGORY="blockchain"
 # Fill the content below:
-NEWSPAPER_NAME="서울경제"
-HEADLINE='"우리 가수 이름 쓰지마"···영탁 막걸리 때아닌 상표 논쟁'
+NEWSPAPER_NAME="조선비즈"
+HEADLINE='NFT에 꽂힌 게임사, 블록체인 차세대 먹거리로 키운다'
 
 # Path of the tools needed for script
 WEBDRIVER_PATH = os.path.expanduser('~\\chromedriver.exe')
@@ -57,6 +57,12 @@ def clipboardInput(user_xpath, user_input):
     pyperclip.copy(temp_user_input)  # 사용자 클립보드에 저장 된 내용을 다시 가져 옴
     time.sleep(1)
 
+# get content from JSON file
+def getContent():
+    with open('./img_content.json', 'r', encoding='utf-8') as json_obj:
+        content=json.load(json_obj)
+    return content
+
 # get login info from the loginfo_[blog_name].txt file in same directory
 def getLogin(type):
     login_fname="./logInfo_"+type+'.txt'
@@ -66,7 +72,10 @@ def getLogin(type):
     return login
 
 # method for creating head image
-def headImageCreate(typ, category, newspaper, headline):
+def headImageCreate():
+    os.startfile(".\head_img_generator.jsx")
+
+def writeContent(typ, category, newspaper, headline):
     content=dict()
     content["type"]=typ
     content["category"]=category
@@ -74,7 +83,6 @@ def headImageCreate(typ, category, newspaper, headline):
     content["headline"]=headline
     with open('./img_content.json', 'w', encoding='utf-8') as make_file:
         json.dump(content, make_file, indent="\t", ensure_ascii=False)
-    os.startfile(".\head_img_generator.jsx")
 
 driver=webdriver.Chrome(WEBDRIVER_PATH)
 login=getLogin(TYPE)
@@ -89,8 +97,11 @@ login_url = "https://nid.naver.com/nidlogin.login"
 blog_categ_url = ('https://blog.naver.com/PostList.nhn?blogId='
     +login["id"]+'&from=postList&categoryNo='+blog_categ_idx[CATEGORY])
 
+# write content into JSON file
+writeContent(TYPE, CATEGORY,NEWSPAPER_NAME, HEADLINE)
+
 #create headline image
-headImageCreate(TYPE, CATEGORY,NEWSPAPER_NAME, HEADLINE)
+headImageCreate()
 
 # login page
 driver.get(login_url)

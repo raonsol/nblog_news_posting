@@ -1,5 +1,4 @@
 ﻿//@target illustrator
-//@include "json2.js"
 
 //return date as yy-mm-dd format
 Date.prototype.yymmdd = function() {
