@@ -1,5 +1,6 @@
 ﻿//@target illustrator
 //@include json2.js
+//locate this file in {Username}\\Documents\\Adobe Scripts\\
 
 //return date as yy-mm-dd format
 Date.prototype.yymmdd = function() {
