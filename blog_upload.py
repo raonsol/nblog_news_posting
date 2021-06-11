@@ -14,6 +14,7 @@ import pyperclip
 import time
 from datetime import datetime
 import os
+import subprocess
 import json
 from bs4 import BeautifulSoup
 import HTMLClipboard
@@ -22,21 +23,21 @@ from cssutils import parseStyle
 #############################################################################################
 # Type entry:
 # [MGEN] for mgen blog, [IPF] for IPFrontiers blog
-TYPE = 'IPF'
+TYPE = 'MGEN'
 # Category entry for MGEN:
 # blockchain, smart_factory, 3dmet
 # Category entry for IPF:
 # patent=특허, design=상표디자인, copyright=저작권, ipsuit=IP분쟁소송, startup=Startup Info.
-CATEGORY = "startup"
+CATEGORY = "smart_factory"
 # Fill the content below:
-NEWSPAPER_NAME = "이데일리"
-HEADLINE = '"기후위기 해결" 전 세계 스타트업 모였다'
-URL = 'https://www.edaily.co.kr/news/read?newsId=02328806629054496'
+NEWSPAPER_NAME = "연합뉴스"
+HEADLINE = "'서울 국제 스마트팩토리 콘퍼런스＆엑스포' 15일 코엑스서 개최"
+URL = 'https://www.yna.co.kr/view/AKR20210609087000848'
 
 # Path of the tools needed for script
 WEBDRIVER_PATH = os.path.expanduser('~\\chromedriver.exe')
-ESTK_PATH = "C:\\Program Files (x86)\\Adobe\\Adobe Utilities - CS6\\ExtendScript Toolkit CS6\\ExtendScript Toolkit.exe"
-SCRIPT_PATH="C:\\Users\\MGEN\\Documents\\Adobe Scripts\\head_img_generator.jsx"
+ILLUSTRATOR_PATH = "C:\\Program Files\\Adobe\\Adobe Illustrator CS6 (64 Bit)\\Support Files\\Contents\\Windows\\Illustrator.exe"
+SCRIPT_PATH=os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), "head_img_generator.js")
 #############################################################################################
 DEST_MGEN = "C:\\Users\\MGEN\\Desktop\\LYJ\\11. Blog\\Output\\"
 DEST_IPF = "C:\\Users\\MGEN\\Desktop\\LYJ\\00. IPF\\Output\\"
@@ -68,8 +69,6 @@ blog_categ_ipf_c = {
 }
 
 # get path based on current date
-
-
 def getDatePath(outpath):
     year = str(datetime.today().year)
     month = datetime.today().month
@@ -78,8 +77,6 @@ def getDatePath(outpath):
     return os.path.join(outpath, year, month)
 
 # clipboard method for avoid captcha
-
-
 def clipboardInput(user_xpath, user_input):
     temp_user_input = pyperclip.paste()  # 사용자 클립보드를 따로 저장
 
@@ -92,16 +89,12 @@ def clipboardInput(user_xpath, user_input):
     time.sleep(1)
 
 # get content from JSON file
-
-
 def getContent():
     with open('./img_content.json', 'r', encoding='utf-8') as json_obj:
         content = json.load(json_obj)
     return content
 
 # get login info from the loginfo_[blog_name].txt file in same directory
-
-
 def getLogin(type):
     login_fname = "./logInfo_"+type+'.txt'
     f = open(login_fname, 'r')
@@ -110,11 +103,9 @@ def getLogin(type):
     return login
 
 # method for creating head image
-
-
 def createHeadImage():
-    os.startfile(SCRIPT_PATH)
-
+    print("Loading script in "+SCRIPT_PATH)
+    p = subprocess.Popen([ILLUSTRATOR_PATH, SCRIPT_PATH])
 
 def writeContent(typ, category, newspaper, headline):
     content = dict()
@@ -248,6 +239,7 @@ HTMLClipboard.PutHtml(url_table)
 # Ctrl+V, dependant on OS
 ActionChains(driver).key_down(Keys.CONTROL).send_keys('v').perform()
 time.sleep(1)
+
 # upload head image
 # TODO: 이미지 파일 경로를 줘도 파일 선택 창이 열림
 
