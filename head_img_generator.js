@@ -9,7 +9,6 @@ Date.prototype.yymmdd = function() {
     return yy + "-" + (mm[1] ? mm : '0' + mm[0]) + "-" + (dd[1] ? dd : '0' + dd[0]);
 }
 
-//TODO: IDE를 통하지 않고 바로 실행시 작동안됨
 //read content from JSON
 var path_JSON="~\\Desktop\\LYJ\\11. Blog\\Automation\\nblog_news_posting\\img_content.json";
 var content = readJSON(path_JSON);
