@@ -28,11 +28,11 @@ TYPE = 'MGEN'
 # blockchain, smart_factory, 3dmet
 # Category entry for IPF:
 # patent=특허, design=상표디자인, copyright=저작권, ipsuit=IP분쟁소송, startup=Startup Info.
-CATEGORY = "smart_factory"
+CATEGORY = "blockchain"
 # Fill the content below:
 NEWSPAPER_NAME = "연합뉴스"
-HEADLINE = "'서울 국제 스마트팩토리 콘퍼런스＆엑스포' 15일 코엑스서 개최"
-URL = 'https://www.yna.co.kr/view/AKR20210609087000848'
+HEADLINE = "블록체인으로 1천만명 이용하는 온라인 투표시스템 구축한다"
+URL = 'https://www.yna.co.kr/view/AKR20210623065100017?input=1195m'
 
 # Path of the tools needed for script
 WEBDRIVER_PATH = os.path.expanduser('~\\chromedriver.exe')
@@ -62,103 +62,106 @@ blog_categ_mgen_c = {
 }
 blog_categ_ipf_c = {
     'patent': 'rgb(195,13,35)',
-    'design': 'rgb(124,234,156)',
+    'design': 'rgb(234,124,156)',
     'copyright': 'rgb(0,157,57)',
     'ipsuit': 'rgb(230,198,110)',
     'startup': 'rgb(5,181,237)',
 }
 
-# get path based on current date
-def getDatePath(outpath):
-    year = str(datetime.today().year)
-    month = datetime.today().month
-    month = str(month).zfill(2)
+class ContentBuilder:
 
-    return os.path.join(outpath, year, month)
-
-# clipboard method for avoid captcha
-def clipboardInput(user_xpath, user_input):
-    temp_user_input = pyperclip.paste()  # 사용자 클립보드를 따로 저장
-
-    pyperclip.copy(user_input)
-    driver.find_element_by_xpath(user_xpath).click()
-    ActionChains(driver).key_down(Keys.CONTROL).send_keys(
-        'v').key_up(Keys.CONTROL).perform()
-
-    pyperclip.copy(temp_user_input)  # 사용자 클립보드에 저장 된 내용을 다시 가져 옴
-    time.sleep(1)
-
-# get content from JSON file
-def getContent():
-    with open('./img_content.json', 'r', encoding='utf-8') as json_obj:
-        content = json.load(json_obj)
-    return content
-
-# get login info from the loginfo_[blog_name].txt file in same directory
-def getLogin(type):
-    login_fname = "./logInfo_"+type+'.txt'
-    f = open(login_fname, 'r')
-    lines = f.readlines()
-    login = {"id": lines[0], "pw": lines[1]}
-    return login
-
-# method for creating head image
-def createHeadImage():
-    print("Loading script in "+SCRIPT_PATH)
-    p = subprocess.Popen([ILLUSTRATOR_PATH, SCRIPT_PATH])
-
-def writeContent(typ, category, newspaper, headline):
-    content = dict()
-    content["type"] = typ
-    content["category"] = category
-    content["newspaper"] = newspaper
-    content["headline"] = headline
-    with open('./img_content.json', 'w', encoding='utf-8') as make_file:
-        json.dump(content, make_file, indent="\t", ensure_ascii=False)
-
-
-def createSourceTable(type, newspaper, url, color):
-    file_name = "url_source_{}.html".format(type)
-
-    # shorten url
-    if url.startswith("http://"):
-        url = url.replace("http://", "")
-    elif url.startswith("https://"):
-        url = url.replace("https://", "")
-
-    if url.startswith("www."):
-        url = url.replace("www.", "")
-
-    with open(file_name, encoding='utf-8') as fp:
-        soup = BeautifulSoup(fp, 'html.parser')
-
-    # change name and color of newspaper
-    newspaper_content = soup.find('span', {"id": "SE-newspaper-name"})
-    newspaper_content.string.replace_with(newspaper)
-    style = parseStyle(newspaper_content['style'])
-    style['color'] = color
-    # Replace td's styles in the soup with the modified styles
-    newspaper_content['style'] = style.cssText
-
-    # change url
-    url_content = soup.find('span', {"id": "SE-url-shorten"})
-    url_content.string.replace_with(url)
-
-    return str(soup)
+    # get path based on current date
+    def getDatePath(self, outpath):
+        year = str(datetime.today().year)
+        month = datetime.today().month
+        month = str(month).zfill(2)
+    
+        return os.path.join(outpath, year, month)
+    
+    # clipboard method for avoid captcha
+    def clipboardInput(self, user_xpath, user_input):
+        temp_user_input = pyperclip.paste()  # 사용자 클립보드를 따로 저장
+    
+        pyperclip.copy(user_input)
+        driver.find_element_by_xpath(user_xpath).click()
+        ActionChains(driver).key_down(Keys.CONTROL).send_keys(
+            'v').key_up(Keys.CONTROL).perform()
+    
+        pyperclip.copy(temp_user_input)  # 사용자 클립보드에 저장 된 내용을 다시 가져 옴
+        time.sleep(1)
+    
+    # get content from JSON file
+    def getContent(self):
+        with open('./img_content.json', 'r', encoding='utf-8') as json_obj:
+            content = json.load(json_obj)
+        return content
+    
+    # get login info from the loginfo_[blog_name].txt file in same directory
+    def getLogin(self, type):
+        login_fname = "./logInfo_"+type+'.txt'
+        f = open(login_fname, 'r')
+        lines = f.readlines()
+        login = {"id": lines[0], "pw": lines[1]}
+        return login
+    
+    # method for creating head image
+    def createHeadImage(self):
+        print("Loading script in "+SCRIPT_PATH)
+        p = subprocess.Popen([ILLUSTRATOR_PATH, SCRIPT_PATH])
+        p.wait()
+    
+    def writeContent(self, typ, category, newspaper, headline):
+        content = dict()
+        content["type"] = typ
+        content["category"] = category
+        content["newspaper"] = newspaper
+        content["headline"] = headline
+        with open('./img_content.json', 'w', encoding='utf-8') as make_file:
+            json.dump(content, make_file, indent="\t", ensure_ascii=False)
+    
+    def createSourceTable(self, type, newspaper, url, color):
+        file_name = "url_source_{}.html".format(type)
+    
+        # shorten url
+        if url.startswith("http://"):
+            url = url.replace("http://", "")
+        elif url.startswith("https://"):
+            url = url.replace("https://", "")
+    
+        if url.startswith("www."):
+            url = url.replace("www.", "")
+    
+        with open(file_name, encoding='utf-8') as fp:
+            soup = BeautifulSoup(fp, 'html.parser')
+    
+        # change name and color of newspaper
+        newspaper_content = soup.find('span', {"id": "SE-newspaper-name"})
+        newspaper_content.string.replace_with(newspaper)
+        style = parseStyle(newspaper_content['style'])
+        style['color'] = color
+        # Replace td's styles in the soup with the modified styles
+        newspaper_content['style'] = style.cssText
+    
+        # change url
+        url_content = soup.find('span', {"id": "SE-url-shorten"})
+        url_content.string.replace_with(url)
+    
+        return str(soup)
 
 
 driver = webdriver.Chrome(WEBDRIVER_PATH)
-login = getLogin(TYPE)
+builder=ContentBuilder()
+login = builder.getLogin(TYPE)
 
 # assign catagory url and color
 if TYPE == 'MGEN':
     blog_categ_idx = blog_categ_mgen[CATEGORY]
     blog_categ_c = blog_categ_mgen_c[CATEGORY]
-    dest_path = getDatePath(DEST_MGEN)
+    dest_path = builder.getDatePath(DEST_MGEN)
 elif TYPE == "IPF":
     blog_categ_idx = blog_categ_ipf[CATEGORY]
     blog_categ_c = blog_categ_ipf_c[CATEGORY]
-    dest_path = getDatePath(DEST_IPF)
+    dest_path = builder.getDatePath(DEST_IPF)
 else:
     print("Blog Type error!")
 
@@ -167,17 +170,17 @@ blog_categ_url = ('https://blog.naver.com/PostList.nhn?blogId='
                   + login["id"]+'&from=postList&categoryNo='+blog_categ_idx)
 
 # write content into JSON file
-writeContent(TYPE, CATEGORY, NEWSPAPER_NAME, HEADLINE)
+builder.writeContent(TYPE, CATEGORY, NEWSPAPER_NAME, HEADLINE)
 
 # create headline image
-createHeadImage()
+builder.createHeadImage()
 
 ### login page ###
 driver.get(login_url)
 time.sleep(0.2)
-clipboardInput('//*[@id="id"]', login.get("id"))
+builder.clipboardInput('//*[@id="id"]', login.get("id"))
 time.sleep(0.1)
-clipboardInput('//*[@id="pw"]', login.get("pw"))
+builder.clipboardInput('//*[@id="pw"]', login.get("pw"))
 driver.find_element_by_xpath('//*[@id="log.login"]').click()
 
 ### browser save page ###
@@ -188,6 +191,7 @@ time.sleep(1)
 
 ### editor page ###
 driver.get(blog_categ_url)
+
 driver.find_element_by_xpath('//*[@id="post-admin"]/a[1]').click()
 time.sleep(3)
 
@@ -234,7 +238,7 @@ contents = driver.find_element_by_css_selector(
     '.se-component.se-text.se-l-default')
 contents.click()
 # paste edited html
-url_table = createSourceTable(TYPE, NEWSPAPER_NAME, URL, blog_categ_c)
+url_table = builder.createSourceTable(TYPE, NEWSPAPER_NAME, URL, blog_categ_c)
 HTMLClipboard.PutHtml(url_table)
 # Ctrl+V, dependant on OS
 ActionChains(driver).key_down(Keys.CONTROL).send_keys('v').perform()
